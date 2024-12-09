@@ -38,23 +38,31 @@ export default function Page() {
 
   return (
     <div className="flex flex-col w-full max-w-2xl mx-auto space-y-2">
-      <div className="flex flex-row justify-between items-center">
-        <h2>ToDo items</h2>
-        <Button variant="default" size="icon">
+      <div className="flex flex-row justify-between items-center w-full mb-4">
+        <h2 className="text-2xl font-bold text-gray-900 leading-8">
+          ToDo items
+        </h2>
+        <Button
+          variant="default"
+          size="icon"
+          className="flex items-center justify-center leading-none"
+        >
           {/* TODO: Add ToDo item component should come here */}+
         </Button>
       </div>
       {data.map((attr: any, index: number) => (
-        <div
-          className="flex flex-row items-center gap-x-3 justify-between w-full px-5 py-3 ring-inset rounded-xl bg-white"
-          key={index}
-        >
-          <div className="flex flex-row items-center gap-x-3">
-            <Checkbox />
-            <p>{attr.title}</p>
-            <Badge variant="outline">{attr.status}</Badge>
+        <div className="flex flex-row items-center gap-x-3 w-full" key={index}>
+          <div className="flex flex-row items-center justify-between px-5 py-3 ring-inset rounded-xl bg-white w-full">
+            <div className="flex flex-row items-center gap-x-3">
+              <Checkbox />
+              <p>{attr.title}</p>
+              <Badge variant="outline">{attr.status}</Badge>
+            </div>
+            <Button variant="plainBlack" size="sm">
+              {/* TODO: Find a svg for the edit button */}
+              Edit
+            </Button>
           </div>
-          {/* TODO: This should be a variant on the Button component */}
           <Button variant="plainRed" size="sm">
             x
           </Button>

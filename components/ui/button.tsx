@@ -22,10 +22,10 @@ const buttonVariants = cva(
         link: "text-sm font-medium text-primary underline-offset-4 hover:underline",
         headless: "",
         // TODO: rename the two variants below
-        plainRed:
-          "text-sm text-red-500 cursor-pointer hover:bg-gray-100 active:bg-gray-100",
+        // TODO: plainRed needs an active and hover
+        plainRed: "text-sm text-red-500 cursor-pointer",
         plainBlack:
-          "text-sm text-black cursor-pointer hover:bg-white active:bg-white",
+          "text-sm text-black cursor-pointer hover:bg-gray-100 active:bg-gray-100",
       },
       size: {
         default: "h-10 rounded-md px-4 py-2",
