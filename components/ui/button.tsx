@@ -21,9 +21,15 @@ const buttonVariants = cva(
           "text-sm font-medium hover:bg-accent hover:text-accent-foreground",
         link: "text-sm font-medium text-primary underline-offset-4 hover:underline",
         headless: "",
+        // TODO: rename the two variants below
+        plainRed:
+          "text-sm text-red-500 cursor-pointer hover:bg-gray-100 active:bg-gray-100",
+        plainBlack:
+          "text-sm text-black cursor-pointer hover:bg-white active:bg-white",
       },
       size: {
         default: "h-10 rounded-md px-4 py-2",
+        xs: "h-4 h-5 rounded-xl",
         sm: "h-9 rounded-xl px-3",
         lg: "h-11 rounded-md px-8",
         icon: "h-10 w-10 rounded-md",
