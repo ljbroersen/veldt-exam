@@ -16,7 +16,7 @@ import {
   DialogClose,
   DialogDescription,
 } from "@/components/ui/dialog";
-// import Add from "@/components/add";
+import Add from "@/components/add";
 
 export default function Page() {
   const { mockUsecase } = useUsecases();
@@ -38,16 +38,11 @@ export default function Page() {
   }
 
   if (isError) {
-    return <p>Error: {isError}</p>;
-  }
-
-  if (!data || data.length === 0) {
-    return <p>Data: Not Found</p>;
+    return <p>Error loading tasks</p>;
   }
 
   return (
     <div className="flex flex-col w-full max-w-2xl mx-auto space-y-2">
-      {/* Header with Dialog for Add */}
       <div className="flex flex-row justify-between items-center w-full mb-4">
         <h2 className="text-2xl font-bold text-gray-900 leading-8">
           ToDo items
@@ -59,7 +54,7 @@ export default function Page() {
               size="icon"
               className="flex items-center justify-center leading-none"
             >
-              {/* TODO: Add ToDo item component should come here */}+
+              +
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -69,8 +64,7 @@ export default function Page() {
                 Use this form to add a new ToDo item to your list.
               </DialogDescription>
             </DialogHeader>
-            <span>This is a test</span>
-            {/* <Add /> */}
+            <Add />
             <DialogFooter>
               <DialogClose asChild>
                 <Button variant="secondary">Close</Button>
