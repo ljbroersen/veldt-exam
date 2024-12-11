@@ -7,13 +7,41 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useUsecases } from "@/context/usecase";
+import { Button } from "./ui/button";
 
-export default function App() {
-  const methods = useForm();
+export default function Add() {
+  const queryClient = useQueryClient();
+  const { mockUsecase } = useUsecases();
+
+  const { mutate: createToDoDef, isError } = useMutation({
+    mutationFn: (newToDo: any) => mockUsecase.createToDoDef(newToDo),
+    onSuccess: (newToDo) => {
+      queryClient.setQueryData(["todo-def"], (old: any) => {
+        return [...(old || []), newToDo];
+      });
+    },
+  });
+
+  const methods = useForm({
+    defaultValues: {
+      title: "",
+      description: "",
+      deadline: "",
+      created_at: new Date(),
+      updated_at: new Date(),
+    },
+  });
+
+  if (isError) {
+    return <p>Error loading tasks</p>;
+  }
+
   const { control, handleSubmit, formState } = methods;
 
   const onSubmit = (data: any) => {
-    console.log("Form Data Submitted:", data);
+    createToDoDef(data);
   };
 
   return (
@@ -38,7 +66,12 @@ function MyForm({ control, handleSubmit, formState, onSubmit }: any) {
           <>
             <FormLabel htmlFor="title">Title</FormLabel>
             <FormControl>
-              <Input {...field} id="title" placeholder="Enter a title" />
+              <Input
+                {...field}
+                id="title"
+                placeholder="Enter a title"
+                value={field.value || ""}
+              />
             </FormControl>
             {formState.errors.title && (
               <FormMessage>{formState.errors.title?.message}</FormMessage>
@@ -58,18 +91,38 @@ function MyForm({ control, handleSubmit, formState, onSubmit }: any) {
                 {...field}
                 id="description"
                 placeholder="Enter a description"
+                value={field.value || ""}
               />
             </FormControl>
           </>
         )}
       />
 
-      <button
-        type="submit"
-        className="bg-blue-500 text-white px-4 py-2 rounded"
-      >
+      <FormField
+        name="deadline"
+        control={control}
+        render={({ field }) => (
+          <>
+            <FormLabel htmlFor="deadline">Deadline</FormLabel>
+            <FormControl>
+              <Input
+                {...field}
+                id="deadline"
+                type="datetime-local"
+                placeholder="Select deadline"
+                value={field.value || ""}
+              />
+            </FormControl>
+            {formState.errors.deadline && (
+              <FormMessage>{formState.errors.deadline?.message}</FormMessage>
+            )}
+          </>
+        )}
+      />
+
+      <Button variant="default" size="lg" type="submit">
         Submit
-      </button>
+      </Button>
     </form>
   );
 }

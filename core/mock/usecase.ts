@@ -18,4 +18,13 @@ export class MockUsecase {
       throw error;
     }
   }
+
+  async createToDoDef(newToDo: any): Promise<any> {
+    try {
+      return await this.repository.createToDoDef(newToDo);
+    } catch (error) {
+      this.error(error);
+      throw error;
+    }
+  }
 }
