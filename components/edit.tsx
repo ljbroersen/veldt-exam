@@ -11,36 +11,54 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUsecases } from "@/context/usecase";
 import { Button } from "./ui/button";
 
-export default function Add() {
+type EditProps = {
+  todo: any;
+  onClose: () => void;
+};
+
+export default function Edit({ todo, onClose }: EditProps) {
   const queryClient = useQueryClient();
   const { mockUsecase } = useUsecases();
 
-  const { mutate: createToDoDef, isError } = useMutation({
-    mutationFn: (newToDo: any) => mockUsecase.createToDoDef(newToDo),
-    onSuccess: (newToDo) => {
-      queryClient.setQueryData(["todo-def"], (old: any) => [
-        ...(old || []),
-        newToDo,
-      ]);
+  const { mutate: updateToDoDef, isError } = useMutation({
+    mutationFn: (updatedToDo: any) =>
+      mockUsecase.updateToDoDef(todo.id, updatedToDo),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["todo-def"] });
+      onClose();
     },
   });
 
+  const formatDeadline = (date: string | null) => {
+    if (!date) return "";
+    const parsedDate = new Date(date);
+    return parsedDate.toISOString().slice(0, 16);
+  };
+
   const methods = useForm({
     defaultValues: {
-      title: "",
-      description: "",
-      deadline: "",
-      created_at: new Date(),
+      title: todo.title || "",
+      description: todo.description || "",
+      deadline: formatDeadline(todo.deadline) || "",
       updated_at: new Date(),
     },
   });
 
+  React.useEffect(() => {
+    methods.reset({
+      title: todo.title || "",
+      description: todo.description || "",
+      deadline: formatDeadline(todo.deadline) || "",
+      updated_at: new Date(),
+    });
+  }, [todo]);
+
   if (isError) {
-    return <p>Error creating task</p>;
+    return <p>Error updating task</p>;
   }
 
   const onSubmit = (data: any) => {
-    createToDoDef(data);
+    updateToDoDef(data);
   };
 
   return (
@@ -49,21 +67,19 @@ export default function Add() {
         <FormField
           name="title"
           control={methods.control}
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <>
               <FormLabel htmlFor="title">Title</FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   id="title"
-                  placeholder="Enter a title"
+                  placeholder="Edit the title"
                   value={field.value || ""}
                 />
               </FormControl>
-              {methods.formState.errors.title && (
-                <FormMessage>
-                  {methods.formState.errors.title?.message}
-                </FormMessage>
+              {fieldState.error?.message && (
+                <FormMessage>{String(fieldState.error.message)}</FormMessage>
               )}
             </>
           )}
@@ -72,17 +88,20 @@ export default function Add() {
         <FormField
           name="description"
           control={methods.control}
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <>
               <FormLabel htmlFor="description">Description</FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   id="description"
-                  placeholder="Enter a description"
+                  placeholder="Edit the description"
                   value={field.value || ""}
                 />
               </FormControl>
+              {fieldState.error?.message && (
+                <FormMessage>{String(fieldState.error.message)}</FormMessage>
+              )}
             </>
           )}
         />
@@ -90,7 +109,7 @@ export default function Add() {
         <FormField
           name="deadline"
           control={methods.control}
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <>
               <FormLabel htmlFor="deadline">Deadline</FormLabel>
               <FormControl>
@@ -98,22 +117,20 @@ export default function Add() {
                   {...field}
                   id="deadline"
                   type="datetime-local"
-                  placeholder="Select deadline"
-                  value={field.value || ""}
+                  placeholder="Edit the deadline"
+                  value={formatDeadline(field.value)}
                   className="w-min"
                 />
               </FormControl>
-              {methods.formState.errors.deadline && (
-                <FormMessage>
-                  {methods.formState.errors.deadline?.message}
-                </FormMessage>
+              {fieldState.error?.message && (
+                <FormMessage>{String(fieldState.error.message)}</FormMessage>
               )}
             </>
           )}
         />
 
         <Button variant="default" size="lg" type="submit">
-          Submit
+          Update
         </Button>
       </form>
     </FormProvider>

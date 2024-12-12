@@ -20,6 +20,18 @@ export class MockGateway {
     return todo;
   }
 
+  async updateToDoDef(id: number, updatedFields: any): Promise<any> {
+    const index = todoRes.findIndex((todo) => todo.id === id);
+    if (index !== -1) {
+      todoRes[index] = {
+        ...todoRes[index],
+        ...updatedFields,
+        updated_at: new Date().toISOString(),
+      };
+    }
+    return todoRes[index];
+  }
+
   async updateToDoStatus(id: number, status: string): Promise<any> {
     const index = todoRes.findIndex((todo) => todo.id === id);
     if (index !== -1) {

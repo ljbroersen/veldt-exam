@@ -8,23 +8,28 @@ import { useUsecases } from "@/context/usecase";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
   DialogClose,
   DialogDescription,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import Add from "@/components/add";
+import Edit from "@/components/edit";
+import { useState } from "react";
 
 export default function Page() {
   const { mockUsecase } = useUsecases();
   const queryClient = useQueryClient();
 
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedTodo, setSelectedTodo] = useState<any>(null);
+
   const { data, isPending, isError } = useQuery({
     queryKey: ["todo-def"],
-    queryFn: () => mockUsecase.fetchToDoDef(), // this is the data
+    queryFn: () => mockUsecase.fetchToDoDef(),
     staleTime: Infinity,
     gcTime: Infinity,
   });
@@ -36,6 +41,20 @@ export default function Page() {
       queryClient.invalidateQueries({ queryKey: ["todo-def"] });
     },
   });
+
+  const toggleDialog = (todo?: any) => {
+    if (todo) {
+      setSelectedTodo(todo);
+      setIsDialogOpen(true);
+    } else {
+      setIsDialogOpen(false);
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setSelectedTodo(null);
+  };
 
   if (isPending) {
     return (
@@ -100,16 +119,33 @@ export default function Page() {
               <p>{attr.title}</p>
               <Badge variant="outline">{attr.status}</Badge>
             </div>
-            <Button variant="plainBlack" size="sm">
-              {/* TODO: Find a svg for the edit button */}
+            <Button
+              variant="plainBlack"
+              size="sm"
+              onClick={() => toggleDialog(attr)}
+            >
               Edit
             </Button>
           </div>
-          <Button variant="plainRed" size="sm">
-            x
-          </Button>
         </div>
       ))}
+
+      {isDialogOpen && selectedTodo && (
+        <Dialog open={isDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit ToDo Item</DialogTitle>
+              <DialogDescription>Edit your ToDo item.</DialogDescription>
+            </DialogHeader>
+            <Edit todo={selectedTodo} onClose={handleCloseDialog} />
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="secondary">Close</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
