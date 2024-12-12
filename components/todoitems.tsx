@@ -1,5 +1,3 @@
-"use client";
-
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -57,6 +55,14 @@ export default function ToDoItems() {
     setSelectedTodo(null);
   };
 
+  const isApproachingDeadline = (deadline: string) => {
+    const currentTime = new Date().getTime();
+    const deadlineTime = new Date(deadline).getTime();
+    const timeDifference = deadlineTime - currentTime;
+
+    return timeDifference > 0 && timeDifference <= 3 * 24 * 60 * 60 * 1000;
+  };
+
   if (isPending) {
     return (
       <div className="flex flex-col w-full max-w-2xl mx-auto space-y-2">
@@ -74,8 +80,13 @@ export default function ToDoItems() {
   return (
     <div className="flex flex-col w-full max-w-2xl mx-auto space-y-2">
       {data.map((attr: any, index: number) => (
-        <div className="flex flex-row items-center gap-x-3 w-full" key={index}>
-          <div className="flex flex-row items-center justify-between px-5 py-3 ring-inset rounded-xl bg-white w-full">
+        <div
+          className={`flex flex-row items-center gap-x-3 w-full ${
+            isApproachingDeadline(attr.deadline) ? "bg-red-100" : "bg-white"
+          }`}
+          key={index}
+        >
+          <div className="flex flex-row items-center justify-between px-5 py-3 ring-inset rounded-xl w-full">
             <div className="flex flex-row items-center gap-x-3">
               <Checkbox
                 checked={attr.status === "completed"}

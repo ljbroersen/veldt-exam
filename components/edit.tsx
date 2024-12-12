@@ -10,6 +10,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUsecases } from "@/context/usecase";
 import { Button } from "./ui/button";
+import { useEffect } from "react";
 
 type EditProps = {
   todo: any;
@@ -44,7 +45,7 @@ export default function Edit({ todo, onClose }: EditProps) {
     },
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     methods.reset({
       title: todo.title || "",
       description: todo.description || "",

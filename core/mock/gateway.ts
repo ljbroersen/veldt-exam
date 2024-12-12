@@ -17,6 +17,7 @@ export class MockGateway {
       updated_at: new Date().toISOString(),
     };
 
+    todoRes.push(todo);
     return todo;
   }
 

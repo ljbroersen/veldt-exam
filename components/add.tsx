@@ -22,6 +22,7 @@ export default function Add() {
         ...(old || []),
         newToDo,
       ]);
+      queryClient.invalidateQueries({ queryKey: ["todo-def"] });
     },
   });
 
