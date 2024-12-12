@@ -39,4 +39,12 @@ export class MockGateway {
     }
     return todoRes[index];
   }
+
+  async deleteToDoDef(id: number): Promise<any> {
+    const index = todoRes.findIndex((todo) => todo.id === id);
+    if (index !== -1) {
+      todoRes.splice(index, 1);
+    }
+    return { success: true };
+  }
 }

@@ -37,6 +37,11 @@ export default function Page() {
   const { mutate: toggleStatus } = useMutation({
     mutationFn: (payload: { id: number; status: string }) =>
       mockUsecase.updateToDoStatus(payload.id, payload.status),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["todo-def"] }),
+  });
+
+  const { mutate: deleteToDo } = useMutation({
+    mutationFn: (id: number) => mockUsecase.deleteToDoDef(id, {}),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["todo-def"] });
     },
@@ -119,13 +124,22 @@ export default function Page() {
               <p>{attr.title}</p>
               <Badge variant="outline">{attr.status}</Badge>
             </div>
-            <Button
-              variant="plainBlack"
-              size="sm"
-              onClick={() => toggleDialog(attr)}
-            >
-              Edit
-            </Button>
+            <div className="flex space-x-2">
+              <Button
+                variant="plainBlack"
+                size="sm"
+                onClick={() => toggleDialog(attr)}
+              >
+                Edit
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => deleteToDo(attr.id)}
+              >
+                Delete
+              </Button>
+            </div>
           </div>
         </div>
       ))}

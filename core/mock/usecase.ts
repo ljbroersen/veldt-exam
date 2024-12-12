@@ -45,4 +45,13 @@ export class MockUsecase {
       throw error;
     }
   }
+
+  async deleteToDoDef(id: number, deletedToDo: any): Promise<any> {
+    try {
+      return await this.repository.deleteToDoDef(id, deletedToDo);
+    } catch (error) {
+      this.error(error);
+      throw error;
+    }
+  }
 }
