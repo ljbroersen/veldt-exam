@@ -7,17 +7,24 @@ export class MockGateway {
   }
 
   async createToDoDef(newToDo: any): Promise<any> {
-    const now = new Date().toISOString();
     const newId = todoRes.length > 0 ? todoRes[todoRes.length - 1].id + 1 : 1;
 
     const todo = {
       id: newId,
       ...newToDo,
       status: "incomplete",
-      created_at: now,
-      updated_at: now,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
 
     return todo;
+  }
+
+  async updateToDoStatus(id: number, status: string): Promise<any> {
+    const index = todoRes.findIndex((todo) => todo.id === id);
+    if (index !== -1) {
+      todoRes[index].status = status;
+    }
+    return todoRes[index];
   }
 }

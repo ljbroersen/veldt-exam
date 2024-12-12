@@ -27,4 +27,13 @@ export class MockUsecase {
       throw error;
     }
   }
+
+  async updateToDoStatus(id: number, status: string): Promise<any> {
+    try {
+      return await this.repository.updateToDoStatus(id, status);
+    } catch (error) {
+      this.error(error);
+      throw error;
+    }
+  }
 }

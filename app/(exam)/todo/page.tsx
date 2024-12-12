@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
@@ -20,11 +20,21 @@ import Add from "@/components/add";
 
 export default function Page() {
   const { mockUsecase } = useUsecases();
+  const queryClient = useQueryClient();
+
   const { data, isPending, isError } = useQuery({
     queryKey: ["todo-def"],
     queryFn: () => mockUsecase.fetchToDoDef(), // this is the data
     staleTime: Infinity,
     gcTime: Infinity,
+  });
+
+  const { mutate: toggleStatus } = useMutation({
+    mutationFn: (payload: { id: number; status: string }) =>
+      mockUsecase.updateToDoStatus(payload.id, payload.status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["todo-def"] });
+    },
   });
 
   if (isPending) {
@@ -78,7 +88,15 @@ export default function Page() {
         <div className="flex flex-row items-center gap-x-3 w-full" key={index}>
           <div className="flex flex-row items-center justify-between px-5 py-3 ring-inset rounded-xl bg-white w-full">
             <div className="flex flex-row items-center gap-x-3">
-              <Checkbox />
+              <Checkbox
+                checked={attr.status === "completed"}
+                onCheckedChange={(checked) => {
+                  toggleStatus({
+                    id: attr.id,
+                    status: checked ? "completed" : "incomplete",
+                  });
+                }}
+              />
               <p>{attr.title}</p>
               <Badge variant="outline">{attr.status}</Badge>
             </div>
