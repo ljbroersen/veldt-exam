@@ -20,7 +20,10 @@ type EditProps = {
 };
 
 const schema = yup.object().shape({
-  title: yup.string().required("Title is required"),
+  title: yup
+    .string()
+    .required("Title is required")
+    .max(16, "Title cannot be longer than 16 characters!"),
   description: yup.string().required("Description is required!"),
   deadline: yup
     .string()
@@ -96,6 +99,7 @@ export default function Edit({ todo, onClose }: EditProps) {
                   id="title"
                   placeholder="Edit the title"
                   value={field.value}
+                  maxLength={16}
                 />
               </FormControl>
               <FormMessage>

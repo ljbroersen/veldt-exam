@@ -16,7 +16,7 @@ import ToDoItems from "@/components/todoitems";
 
 export default function Page() {
   return (
-    <div className="flex flex-col w-full max-w-2xl mx-auto space-y-2">
+    <div className="flex flex-col w-full max-w-3xl mx-auto space-y-2">
       <div className="flex flex-row justify-between items-center w-full mb-4">
         <h2 className="text-2xl font-bold text-gray-900 leading-8">
           ToDo items

@@ -57,8 +57,9 @@ export default function ToDoItems() {
 
   const isApproachingDeadline = (deadline: string | null | undefined) => {
     if (!deadline) return false;
-    const currentTime = new Date().getTime();
+
     const deadlineTime = new Date(deadline).getTime();
+    const currentTime = new Date().getTime();
     const timeDifference = deadlineTime - currentTime;
     return timeDifference > 0 && timeDifference <= 24 * 60 * 60 * 1000;
   };
@@ -77,48 +78,75 @@ export default function ToDoItems() {
     return <p>Error loading tasks</p>;
   }
 
-  return (
-    <div className="flex flex-col w-full max-w-2xl mx-auto space-y-2">
-      {data.map((attr: any, index: number) => (
-        <div
-          className={`flex flex-row items-center gap-x-3 w-full ${
-            isApproachingDeadline(attr.deadline) ? "bg-red-100" : "bg-white"
-          }`}
-          key={index}
-        >
-          <div className="flex flex-row items-center justify-between px-5 py-3 ring-inset rounded-xl w-full">
-            <div className="flex flex-row items-center gap-x-3">
-              <Checkbox
-                checked={attr.status === "completed"}
-                onCheckedChange={(checked) => {
-                  toggleStatus({
-                    id: attr.id,
-                    status: checked ? "completed" : "incomplete",
-                  });
-                }}
-              />
-              <p>{attr.title}</p>
-              <Badge variant="outline">{attr.status}</Badge>
-            </div>
-            <div className="flex space-x-2">
-              <Button
-                variant="plainBlack"
-                size="sm"
-                onClick={() => toggleDialog(attr)}
-              >
-                Edit
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => deleteToDo(attr.id)}
-              >
-                Delete
-              </Button>
-            </div>
+  const completedItems = data.filter(
+    (attr: any) => attr.status === "completed"
+  );
+  const incompleteItems = data.filter(
+    (attr: any) => attr.status === "incomplete"
+  );
+
+  const renderToDoItems = (data: any[]) => {
+    return data.map((attr: any, index: number) => (
+      <div
+        className={`flex flex-row items-center gap-x-3 w-full ${
+          isApproachingDeadline(attr.deadline) ? "bg-red-100" : "bg-white"
+        }`}
+        key={index}
+      >
+        <div className="flex flex-row items-center justify-between px-5 py-3 ring-inset rounded-xl w-full">
+          <div className="flex flex-row items-center gap-x-3">
+            <Checkbox
+              checked={attr.status === "completed"}
+              onCheckedChange={(checked) => {
+                toggleStatus({
+                  id: attr.id,
+                  status: checked ? "completed" : "incomplete",
+                });
+              }}
+            />
+            <p className="truncate max-w-[60%]">{attr.title}</p>
+            <Badge variant="outline">{attr.status}</Badge>
+          </div>
+          <div className="flex space-x-2">
+            <Button
+              variant="plainBlack"
+              size="sm"
+              onClick={() => toggleDialog(attr)}
+            >
+              Edit
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => deleteToDo(attr.id)}
+            >
+              Delete
+            </Button>
           </div>
         </div>
-      ))}
+      </div>
+    ));
+  };
+
+  return (
+    <div className="flex flex-col w-full max-w-2xl mx-auto space-y-4">
+      <section>
+        <h2 className="text-lg font-bold mb-2">Incomplete Tasks</h2>
+        {incompleteItems.length > 0 ? (
+          renderToDoItems(incompleteItems)
+        ) : (
+          <p>You completed all your tasks!</p>
+        )}
+      </section>
+
+      <section>
+        <h2 className="text-lg font-bold mb-2">Completed Tasks</h2>
+        {completedItems.length > 0 ? (
+          renderToDoItems(completedItems)
+        ) : (
+          <p>No completed tasks</p>
+        )}
+      </section>
 
       {isDialogOpen && selectedTodo && (
         <Dialog
