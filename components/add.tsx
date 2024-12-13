@@ -10,6 +10,25 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUsecases } from "@/context/usecase";
 import { Button } from "./ui/button";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+
+const schema = yup.object().shape({
+  title: yup.string().required("Title is required!"),
+  description: yup.string().required("Description is required!"),
+  deadline: yup
+    .string()
+    .nullable()
+    .test("not-in-past", "Deadline cannot be in the past!", (value) => {
+      if (!value) return true;
+      const selectedDate = new Date(value);
+      const now = new Date();
+      now.setSeconds(0, 0);
+      return selectedDate >= now;
+    }),
+  created_at: yup.date().default(() => new Date()),
+  updated_at: yup.date().default(() => new Date()),
+});
 
 export default function Add() {
   const queryClient = useQueryClient();
@@ -34,6 +53,7 @@ export default function Add() {
       created_at: new Date(),
       updated_at: new Date(),
     },
+    resolver: yupResolver(schema),
   });
 
   if (isError) {
@@ -58,14 +78,12 @@ export default function Add() {
                   {...field}
                   id="title"
                   placeholder="Enter a title"
-                  value={field.value || ""}
+                  value={field.value}
                 />
               </FormControl>
-              {methods.formState.errors.title && (
-                <FormMessage>
-                  {methods.formState.errors.title?.message}
-                </FormMessage>
-              )}
+              <FormMessage>
+                {methods.formState.errors.title?.message}
+              </FormMessage>
             </>
           )}
         />
@@ -81,9 +99,12 @@ export default function Add() {
                   {...field}
                   id="description"
                   placeholder="Enter a description"
-                  value={field.value || ""}
+                  value={field.value}
                 />
               </FormControl>
+              <FormMessage>
+                {methods.formState.errors.description?.message}
+              </FormMessage>
             </>
           )}
         />
@@ -104,11 +125,9 @@ export default function Add() {
                   className="w-min"
                 />
               </FormControl>
-              {methods.formState.errors.deadline && (
-                <FormMessage>
-                  {methods.formState.errors.deadline?.message}
-                </FormMessage>
-              )}
+              <FormMessage>
+                {methods.formState.errors.deadline?.message}
+              </FormMessage>
             </>
           )}
         />

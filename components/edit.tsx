@@ -11,11 +11,29 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUsecases } from "@/context/usecase";
 import { Button } from "./ui/button";
 import { useEffect } from "react";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 type EditProps = {
   todo: any;
   onClose: () => void;
 };
+
+const schema = yup.object().shape({
+  title: yup.string().required("Title is required"),
+  description: yup.string().required("Description is required!"),
+  deadline: yup
+    .string()
+    .nullable()
+    .test("not-in-past", "Deadline cannot be in the past!", (value) => {
+      if (!value) return true;
+      const selectedDate = new Date(value);
+      const now = new Date();
+      now.setSeconds(0, 0);
+      return selectedDate >= now;
+    }),
+  updated_at: yup.date().default(() => new Date()),
+});
 
 export default function Edit({ todo, onClose }: EditProps) {
   const queryClient = useQueryClient();
@@ -30,26 +48,27 @@ export default function Edit({ todo, onClose }: EditProps) {
     },
   });
 
-  const formatDeadline = (date: string | null) => {
-    if (!date) return "";
+  const formatDeadline = (date: string | null | undefined): string | null => {
+    if (!date) return null;
     const parsedDate = new Date(date);
     return parsedDate.toISOString().slice(0, 16);
   };
 
   const methods = useForm({
     defaultValues: {
-      title: todo.title || "",
-      description: todo.description || "",
-      deadline: formatDeadline(todo.deadline) || "",
+      title: todo.title,
+      description: todo.description,
+      deadline: formatDeadline(todo.deadline),
       updated_at: new Date(),
     },
+    resolver: yupResolver(schema),
   });
 
   useEffect(() => {
     methods.reset({
-      title: todo.title || "",
-      description: todo.description || "",
-      deadline: formatDeadline(todo.deadline) || "",
+      title: todo.title,
+      description: todo.description,
+      deadline: formatDeadline(todo.deadline),
       updated_at: new Date(),
     });
   }, [todo]);
@@ -68,7 +87,7 @@ export default function Edit({ todo, onClose }: EditProps) {
         <FormField
           name="title"
           control={methods.control}
-          render={({ field, fieldState }) => (
+          render={({ field }) => (
             <>
               <FormLabel htmlFor="title">Title</FormLabel>
               <FormControl>
@@ -76,12 +95,12 @@ export default function Edit({ todo, onClose }: EditProps) {
                   {...field}
                   id="title"
                   placeholder="Edit the title"
-                  value={field.value || ""}
+                  value={field.value}
                 />
               </FormControl>
-              {fieldState.error?.message && (
-                <FormMessage>{String(fieldState.error.message)}</FormMessage>
-              )}
+              <FormMessage>
+                {methods.formState.errors.title?.message}
+              </FormMessage>
             </>
           )}
         />
@@ -89,7 +108,7 @@ export default function Edit({ todo, onClose }: EditProps) {
         <FormField
           name="description"
           control={methods.control}
-          render={({ field, fieldState }) => (
+          render={({ field }) => (
             <>
               <FormLabel htmlFor="description">Description</FormLabel>
               <FormControl>
@@ -97,12 +116,12 @@ export default function Edit({ todo, onClose }: EditProps) {
                   {...field}
                   id="description"
                   placeholder="Edit the description"
-                  value={field.value || ""}
+                  value={field.value}
                 />
               </FormControl>
-              {fieldState.error?.message && (
-                <FormMessage>{String(fieldState.error.message)}</FormMessage>
-              )}
+              <FormMessage>
+                {methods.formState.errors.description?.message}
+              </FormMessage>
             </>
           )}
         />
@@ -110,7 +129,7 @@ export default function Edit({ todo, onClose }: EditProps) {
         <FormField
           name="deadline"
           control={methods.control}
-          render={({ field, fieldState }) => (
+          render={({ field }) => (
             <>
               <FormLabel htmlFor="deadline">Deadline</FormLabel>
               <FormControl>
@@ -119,13 +138,13 @@ export default function Edit({ todo, onClose }: EditProps) {
                   id="deadline"
                   type="datetime-local"
                   placeholder="Edit the deadline"
-                  value={formatDeadline(field.value)}
+                  value={formatDeadline(field.value) || ""}
                   className="w-min"
                 />
               </FormControl>
-              {fieldState.error?.message && (
-                <FormMessage>{String(fieldState.error.message)}</FormMessage>
-              )}
+              <FormMessage>
+                {methods.formState.errors.deadline?.message}
+              </FormMessage>
             </>
           )}
         />

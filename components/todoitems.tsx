@@ -55,12 +55,12 @@ export default function ToDoItems() {
     setSelectedTodo(null);
   };
 
-  const isApproachingDeadline = (deadline: string) => {
+  const isApproachingDeadline = (deadline: string | null | undefined) => {
+    if (!deadline) return false;
     const currentTime = new Date().getTime();
     const deadlineTime = new Date(deadline).getTime();
     const timeDifference = deadlineTime - currentTime;
-
-    return timeDifference > 0 && timeDifference <= 3 * 24 * 60 * 60 * 1000;
+    return timeDifference > 0 && timeDifference <= 24 * 60 * 60 * 1000;
   };
 
   if (isPending) {
@@ -121,7 +121,12 @@ export default function ToDoItems() {
       ))}
 
       {isDialogOpen && selectedTodo && (
-        <Dialog open={isDialogOpen}>
+        <Dialog
+          open={isDialogOpen}
+          onOpenChange={(open) => {
+            if (!open) handleCloseDialog();
+          }}
+        >
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Edit ToDo Item</DialogTitle>
