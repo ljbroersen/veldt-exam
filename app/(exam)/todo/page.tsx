@@ -27,6 +27,7 @@ export default function Page() {
               variant="default"
               size="icon"
               className="flex items-center justify-center leading-none"
+              aria-label="Add a new ToDo Item"
             >
               +
             </Button>

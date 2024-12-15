@@ -13,6 +13,7 @@ import { Button } from "./ui/button";
 import { useEffect } from "react";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { Textarea } from "./ui/textarea";
 
 type EditProps = {
   todo: any;
@@ -116,11 +117,12 @@ export default function Edit({ todo, onClose }: EditProps) {
             <>
               <FormLabel htmlFor="description">Description</FormLabel>
               <FormControl>
-                <Input
+                <Textarea
                   {...field}
                   id="description"
                   placeholder="Edit the description"
                   value={field.value}
+                  rows={4}
                 />
               </FormControl>
               <FormMessage>
@@ -153,7 +155,12 @@ export default function Edit({ todo, onClose }: EditProps) {
           )}
         />
 
-        <Button variant="default" size="lg" type="submit">
+        <Button
+          variant="default"
+          size="lg"
+          type="submit"
+          aria-label="Update ToDo Item"
+        >
           Update
         </Button>
       </form>

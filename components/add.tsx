@@ -12,6 +12,7 @@ import { useUsecases } from "@/context/usecase";
 import { Button } from "./ui/button";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { Textarea } from "./ui/textarea";
 
 const schema = yup.object().shape({
   title: yup
@@ -39,11 +40,22 @@ export default function Add() {
 
   const { mutate: createToDoDef, isError } = useMutation({
     mutationFn: (newToDo: any) => mockUsecase.createToDoDef(newToDo),
-    onSuccess: (newToDo) => {
+    onMutate: async (newToDo) => {
+      await queryClient.cancelQueries({ queryKey: ["todo-def"] });
+
+      const previousToDos = queryClient.getQueryData(["todo-def"]);
+
       queryClient.setQueryData(["todo-def"], (old: any) => [
         ...(old || []),
-        newToDo,
+        { ...newToDo, id: Date.now(), status: "incomplete" },
       ]);
+
+      return { previousToDos };
+    },
+    onError: (context: any) => {
+      queryClient.setQueryData(["todo-def"], context.previousToDos);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["todo-def"] });
     },
   });
@@ -64,7 +76,9 @@ export default function Add() {
   }
 
   const onSubmit = (data: any) => {
+    console.log("Submitting form data:", data);
     createToDoDef(data);
+    methods.reset();
   };
 
   return (
@@ -99,11 +113,12 @@ export default function Add() {
             <>
               <FormLabel htmlFor="description">Description</FormLabel>
               <FormControl>
-                <Input
+                <Textarea
                   {...field}
                   id="description"
                   placeholder="Enter a description"
                   value={field.value}
+                  rows={4}
                 />
               </FormControl>
               <FormMessage>
