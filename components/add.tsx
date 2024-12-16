@@ -13,6 +13,7 @@ import { Button } from "./ui/button";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Textarea } from "./ui/textarea";
+import { ToDoDef } from "@/core/mock/type";
 
 // Validation and error handling
 const schema = yup.object().shape({
@@ -45,7 +46,7 @@ export default function Add({ onClose }: Readonly<AddProps>) {
 
   // Logic behind creating a ToDo Item
   const { mutate: createToDoDef, isError } = useMutation({
-    mutationFn: (newToDo: any) => mockUsecase.createToDoDef(newToDo),
+    mutationFn: (newToDo: ToDoDef) => mockUsecase.createToDoDef(newToDo),
     onMutate: async (newToDo) => {
       await queryClient.cancelQueries({ queryKey: ["todo-def"] });
 

@@ -136,7 +136,7 @@ export default function ToDoItems() {
 
   // renderToDoItems creates the compact, list-like version of each ToDo Item, sorted by Incomplete and Completed Tasks
   const renderToDoItems = (data: ToDoDef[]) => {
-    return data.map((attr: any, index: number) => (
+    return data.map((attr: ToDoDef, index: number) => (
       <div
         className={`flex flex-row items-center gap-x-3 my-2 w-full ${
           isApproachingDeadline(attr.deadline) ? "bg-red-100" : "bg-white"

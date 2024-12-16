@@ -1,7 +1,9 @@
+import { ToDoDef } from "./type";
+
 export interface IMockRepository {
-  fetchToDoDef(): Promise<any>;
-  createToDoDef(newToDo: any): Promise<any>;
-  updateToDoDef(id: number, updatedToDo: any): Promise<any>;
-  updateToDoStatus(id: number, status: string): Promise<any>;
-  deleteToDoDef(id: number, deletedToDo: any): Promise<any>;
+  fetchToDoDef(): Promise<ToDoDef>;
+  createToDoDef(newToDo: ToDoDef): Promise<ToDoDef>;
+  updateToDoDef(id: number, updatedToDo: ToDoDef): Promise<ToDoDef>;
+  updateToDoStatus(id: number, status: string): Promise<ToDoDef>;
+  deleteToDoDef(id: number, deletedToDo: ToDoDef): Promise<ToDoDef>;
 }

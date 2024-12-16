@@ -19,7 +19,7 @@ export class MockUsecase {
     }
   }
 
-  async createToDoDef(newToDo: any): Promise<any> {
+  async createToDoDef(newToDo: ToDoDef): Promise<ToDoDef> {
     try {
       return await this.repository.createToDoDef(newToDo);
     } catch (error) {
@@ -28,7 +28,7 @@ export class MockUsecase {
     }
   }
 
-  async updateToDoDef(id: number, updatedToDo: any): Promise<any> {
+  async updateToDoDef(id: number, updatedToDo: ToDoDef): Promise<ToDoDef> {
     try {
       return await this.repository.updateToDoDef(id, updatedToDo);
     } catch (error) {
@@ -37,7 +37,7 @@ export class MockUsecase {
     }
   }
 
-  async updateToDoStatus(id: number, status: string): Promise<any> {
+  async updateToDoStatus(id: number, status: string): Promise<ToDoDef> {
     try {
       return await this.repository.updateToDoStatus(id, status);
     } catch (error) {
@@ -46,7 +46,7 @@ export class MockUsecase {
     }
   }
 
-  async deleteToDoDef(id: number, deletedToDo: any): Promise<any> {
+  async deleteToDoDef(id: number, deletedToDo: any): Promise<ToDoDef> {
     try {
       return await this.repository.deleteToDoDef(id, deletedToDo);
     } catch (error) {

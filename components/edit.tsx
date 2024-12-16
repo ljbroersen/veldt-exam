@@ -14,9 +14,10 @@ import { useEffect } from "react";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Textarea } from "./ui/textarea";
+import { ToDoDef } from "@/core/mock/type";
 
 type EditProps = {
-  todo: any;
+  todo: ToDoDef;
   onClose: () => void;
 };
 
@@ -46,7 +47,7 @@ export default function Edit({ todo, onClose }: Readonly<EditProps>) {
 
   // Logic behind changing a ToDo Item
   const { mutate: updateToDoDef, isError } = useMutation({
-    mutationFn: (updatedToDo: any) =>
+    mutationFn: (updatedToDo: ToDoDef) =>
       mockUsecase.updateToDoDef(todo.id, updatedToDo),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["todo-def"] });

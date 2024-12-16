@@ -1,12 +1,13 @@
 import { todoRes } from "@/tests/mock";
+import { ToDoDef } from "./type";
 
 export class MockGateway {
-  async fetchToDoDef(): Promise<any> {
+  async fetchToDoDef(): Promise<ToDoDef> {
     const res = todoRes;
     return res as any;
   }
 
-  async createToDoDef(newToDo: any): Promise<any> {
+  async createToDoDef(newToDo: any): Promise<ToDoDef> {
     const newId = todoRes.length > 0 ? todoRes[todoRes.length - 1].id + 1 : 1;
 
     const todo = {
@@ -21,7 +22,7 @@ export class MockGateway {
     return todo;
   }
 
-  async updateToDoDef(id: number, updatedFields: any): Promise<any> {
+  async updateToDoDef(id: number, updatedFields: ToDoDef): Promise<ToDoDef> {
     const index = todoRes.findIndex((todo) => todo.id === id);
     if (index !== -1) {
       todoRes[index] = {
@@ -33,7 +34,7 @@ export class MockGateway {
     return todoRes[index];
   }
 
-  async updateToDoStatus(id: number, status: string): Promise<any> {
+  async updateToDoStatus(id: number, status: string): Promise<ToDoDef> {
     const index = todoRes.findIndex((todo) => todo.id === id);
     if (index !== -1) {
       todoRes[index].status = status;
