@@ -1,52 +1,70 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-
-import { Skeleton } from "@/components/ui/skeleton";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-
-import { useUsecases } from "@/context/usecase";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import Add from "@/components/add";
+import ToDoItems from "@/components/todoitems";
+import { useState } from "react";
 
 export default function Page() {
-  const { mockUsecase } = useUsecases();
-  const { data, isPending, isError } = useQuery({
-    queryKey: ["todo-def"],
-    queryFn: () => mockUsecase.fetchToDoDef(),
-    staleTime: Infinity,
-    gcTime: Infinity,
-  });
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
-  if (isPending) {
-    return (
-      <div className="flex flex-col w-full max-w-2xl mx-auto space-y-2">
-        <Skeleton className="h-12 w-full" />
-        <Skeleton className="h-12 w-full" />
-        <Skeleton className="h-12 w-full" />
-      </div>
-    );
-  }
+  const handleOpenDialog = () => {
+    setIsDialogOpen(true);
+  };
 
-  if (isError) {
-    return <p>Error: {isError}</p>;
-  }
-
-  if (!data || data.length === 0) {
-    return <p>Data: Not Found</p>;
-  }
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+  };
 
   return (
-    <div className="flex flex-col w-full max-w-2xl mx-auto space-y-2">
-      {data.map((attr: any, index: number) => (
-        <div
-          className="flex flex-row items-center gap-x-3 justify-start w-full px-5 py-3 ring-inset rounded-xl bg-white"
-          key={index}
-        >
-          <Checkbox />
-          <p>{attr.title}</p>
-          <Badge variant="outline">{attr.status}</Badge>
-        </div>
-      ))}
+    <div className="flex flex-col w-full max-w-3xl mx-auto space-y-2">
+      <div className="flex flex-row justify-between items-center w-full mb-4">
+        <h2 className="font-bold leading-8">ToDo items</h2>
+
+        {/* Adding a ToDo Item (button) */}
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button
+              variant="default"
+              size="icon"
+              className="flex items-center justify-center leading-none"
+              aria-label="add new"
+              onClick={handleOpenDialog}
+            >
+              +
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New ToDo Item</DialogTitle>
+              <DialogDescription>
+                Use this form to add a new ToDo item to your list.
+              </DialogDescription>
+            </DialogHeader>
+            <Add onClose={handleCloseDialog} />
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="secondary" onClick={handleCloseDialog}>
+                  Close
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {/* The ToDo Items getting fetched in a separate component */}
+      <ToDoItems />
     </div>
   );
 }

@@ -7,7 +7,9 @@ export const metadata: Metadata = {
   description: "ToDo App page.",
 };
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function Layout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <article className="px-6 pt-8 pb-20 bg-neutral-100">
       <Header title="1. ToDo App" />
