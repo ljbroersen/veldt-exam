@@ -20,6 +20,7 @@ type EditProps = {
   onClose: () => void;
 };
 
+// Validation and error handling
 const schema = yup.object().shape({
   title: yup
     .string()
@@ -43,6 +44,7 @@ export default function Edit({ todo, onClose }: EditProps) {
   const queryClient = useQueryClient();
   const { mockUsecase } = useUsecases();
 
+  // Logic behind changing a ToDo Item
   const { mutate: updateToDoDef, isError } = useMutation({
     mutationFn: (updatedToDo: any) =>
       mockUsecase.updateToDoDef(todo.id, updatedToDo),
@@ -77,15 +79,18 @@ export default function Edit({ todo, onClose }: EditProps) {
     });
   }, [todo]);
 
+  // When the ToDo Item couldn't be updated correctly
   if (isError) {
-    return <p>Error updating task</p>;
+    return <p>Error updating ToDoItem</p>;
   }
 
+  // Logic behind submitting the data
   const onSubmit = (data: any) => {
     updateToDoDef(data);
   };
 
   return (
+    // The form with separate input/text fields for Title, Description, Deadline
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)}>
         <FormField
@@ -93,7 +98,12 @@ export default function Edit({ todo, onClose }: EditProps) {
           control={methods.control}
           render={({ field }) => (
             <>
-              <FormLabel htmlFor="title">Title</FormLabel>
+              <div className="flex flex-column justify-between items-center">
+                <FormLabel htmlFor="title">Title</FormLabel>
+                <FormMessage>
+                  {methods.formState.errors.title?.message}
+                </FormMessage>
+              </div>
               <FormControl>
                 <Input
                   {...field}
@@ -103,9 +113,6 @@ export default function Edit({ todo, onClose }: EditProps) {
                   maxLength={16}
                 />
               </FormControl>
-              <FormMessage>
-                {methods.formState.errors.title?.message}
-              </FormMessage>
             </>
           )}
         />
@@ -115,7 +122,12 @@ export default function Edit({ todo, onClose }: EditProps) {
           control={methods.control}
           render={({ field }) => (
             <>
-              <FormLabel htmlFor="description">Description</FormLabel>
+              <div className="flex flex-column justify-between items-center">
+                <FormLabel htmlFor="description">Description</FormLabel>
+                <FormMessage>
+                  {methods.formState.errors.description?.message}
+                </FormMessage>
+              </div>
               <FormControl>
                 <Textarea
                   {...field}
@@ -125,9 +137,6 @@ export default function Edit({ todo, onClose }: EditProps) {
                   rows={4}
                 />
               </FormControl>
-              <FormMessage>
-                {methods.formState.errors.description?.message}
-              </FormMessage>
             </>
           )}
         />
@@ -137,7 +146,13 @@ export default function Edit({ todo, onClose }: EditProps) {
           control={methods.control}
           render={({ field }) => (
             <>
-              <FormLabel htmlFor="deadline">Deadline</FormLabel>
+              <div className="flex flex-column justify-between items-center">
+                <FormLabel htmlFor="deadline">Deadline</FormLabel>
+                <FormMessage>
+                  {methods.formState.errors.deadline?.message}
+                </FormMessage>
+              </div>
+
               <FormControl>
                 <Input
                   {...field}
@@ -148,9 +163,6 @@ export default function Edit({ todo, onClose }: EditProps) {
                   className="w-min"
                 />
               </FormControl>
-              <FormMessage>
-                {methods.formState.errors.deadline?.message}
-              </FormMessage>
             </>
           )}
         />
@@ -159,9 +171,9 @@ export default function Edit({ todo, onClose }: EditProps) {
           variant="default"
           size="lg"
           type="submit"
-          aria-label="Update ToDo Item"
+          aria-label="submit change"
         >
-          Update
+          Change
         </Button>
       </form>
     </FormProvider>

@@ -15,6 +15,7 @@ import {
 import { useUsecases } from "@/context/usecase";
 import { useEffect, useState } from "react";
 import Edit from "./edit";
+import ToDoItemDetails from "./todoitems-details";
 
 export default function ToDoItems() {
   const { mockUsecase } = useUsecases();
@@ -23,6 +24,7 @@ export default function ToDoItems() {
   const [localData, setLocalData] = useState<any[]>([]);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
+  // Logic for fetching the initial mock data
   const { data, isPending, isError } = useQuery({
     queryKey: ["todo-def"],
     queryFn: () => mockUsecase.fetchToDoDef(),
@@ -30,9 +32,10 @@ export default function ToDoItems() {
     gcTime: Infinity,
   });
 
+  // Logic behind local storage
   useEffect(() => {
     if (data) {
-      saveToLocalStorage(data);
+      handleSaveToLocalStorage(data);
       setLocalData(data);
     }
   }, [data]);
@@ -49,7 +52,7 @@ export default function ToDoItems() {
     }
   }, []);
 
-  const saveToLocalStorage = (data: any[]) => {
+  const handleSaveToLocalStorage = (data: any[]) => {
     try {
       localStorage.setItem("todo-items", JSON.stringify(data));
     } catch (error) {
@@ -57,28 +60,31 @@ export default function ToDoItems() {
     }
   };
 
+  // Logic behind changing the status of a ToDo Item
   const { mutate: toggleStatus } = useMutation({
-    mutationFn: (payload: { id: number; status: string }) =>
-      mockUsecase.updateToDoStatus(payload.id, payload.status),
+    mutationFn: (toDoItem: { id: number; status: string }) =>
+      mockUsecase.updateToDoStatus(toDoItem.id, toDoItem.status),
     onSuccess: (_, variables) => {
       const updatedData = localData.map((item) =>
         item.id === variables.id ? { ...item, status: variables.status } : item
       );
       setLocalData(updatedData);
-      saveToLocalStorage(updatedData);
+      handleSaveToLocalStorage(updatedData);
     },
   });
 
+  // Logic behind deleting a ToDo Item
   const { mutate: deleteToDo } = useMutation({
     mutationFn: (id: number) => mockUsecase.deleteToDoDef(id, {}),
     onSuccess: (_, variables) => {
       const updatedData = localData.filter((item) => item.id !== variables);
       setLocalData(updatedData);
-      saveToLocalStorage(updatedData);
+      handleSaveToLocalStorage(updatedData);
     },
   });
 
-  const toggleDialog = (todo?: any) => {
+  // Logic behind showing the right ToDo Item when clicking on the "..." button
+  const handleToggleDialog = (todo?: any) => {
     if (todo) {
       setSelectedTodo(todo);
       setIsDialogOpen(true);
@@ -88,12 +94,14 @@ export default function ToDoItems() {
     }
   };
 
+  // Logic behind closing the Dialog that was opened with handleToggleDialog
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setSelectedTodo(null);
     setIsEditMode(false);
   };
 
+  // Logic to check if the deadline is within 24 hours of the current time
   const isApproachingDeadline = (deadline: string | null | undefined) => {
     if (!deadline) return false;
     const deadlineTime = new Date(deadline).getTime();
@@ -104,6 +112,7 @@ export default function ToDoItems() {
     );
   };
 
+  // While the ToDo Items are being rendered
   if (isPending) {
     return (
       <div className="flex flex-col w-full max-w-2xl mx-auto space-y-2">
@@ -114,10 +123,12 @@ export default function ToDoItems() {
     );
   }
 
+  // When the ToDo Items couldn't be fetched correctly
   if (isError) {
-    return <p>Error loading tasks</p>;
+    return <p>Error loading toDo Items</p>;
   }
 
+  // renderToDoItems creates the compact, list-like version of each ToDo Item, sorted by Incomplete and Completed Tasks
   const renderToDoItems = (data: any[]) => {
     return data.map((attr: any, index: number) => (
       <div
@@ -125,9 +136,9 @@ export default function ToDoItems() {
           isApproachingDeadline(attr.deadline) ? "bg-red-100" : "bg-white"
         }`}
         key={index}
-        aria-label="ToDo Item"
+        aria-label="todo item"
       >
-        <div className="flex flex-row justify-between px-5 py-3 ring-inset w-full border-l-8">
+        <div className="flex flex-row justify-evenly py-3 ring-inset w-full border-l-8">
           <div className="flex items-center">
             <Checkbox
               checked={attr.status === "completed"}
@@ -137,34 +148,46 @@ export default function ToDoItems() {
                   status: checked ? "completed" : "incomplete",
                 });
               }}
-              aria-label="Checkbox to change status ToDo Item"
+              aria-label="change status item"
             />
           </div>
 
           <div className="flex flex-col flex-grow max-w-[60%]">
             <div className="flex flex-row items-center gap-x-2">
-              <p className="truncate font-medium">{attr.title}</p>
-              <Badge variant="outline" aria-label="Status of the ToDo Item">
+              <p className="truncate font-medium text-black">{attr.title}</p>
+              <Badge variant="outline" aria-label="status item">
+                <span
+                  className={`inline-block w-2 h-2 rounded-full mr-2 ${
+                    attr.status === "completed" ? "bg-green-500" : "bg-red-500"
+                  }`}
+                  aria-hidden="true"
+                ></span>
                 {attr.status}
               </Badge>
             </div>
-            <p className="text-sm text-gray-600">{attr.description}</p>
+            <p>
+              Deadline:{" "}
+              {attr.deadline
+                ? new Date(attr.deadline).toLocaleString().slice(0, -3)
+                : "No deadline"}
+            </p>
           </div>
-
+          {/* Button to go to the detailed overview of a ToDo Item */}
           <div className="flex flex-row items-center space-x-3">
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => toggleDialog(attr)}
-              aria-label="View Details ToDo Item"
+              onClick={() => handleToggleDialog(attr)}
+              aria-label="open details window"
             >
               ...
             </Button>
+            {/* Button to delete a ToDo Item */}
             <Button
               variant="destructive"
               size="sm"
               onClick={() => deleteToDo(attr.id)}
-              aria-label="Delete ToDo Item"
+              aria-label="delete item"
             >
               Delete
             </Button>
@@ -177,10 +200,7 @@ export default function ToDoItems() {
   return (
     <div className="flex flex-col w-full max-w-2xl mx-auto space-y-4">
       <section>
-        <h2
-          className="text-lg font-bold mb-2"
-          aria-label="Header for the section of incomplete Tasks"
-        >
+        <h2 className="text-lg font-bold mb-2" aria-label="incomplete tasks">
           Incomplete Tasks
         </h2>
         {localData.some((item) => item.status === "incomplete") ? (
@@ -193,10 +213,7 @@ export default function ToDoItems() {
       </section>
 
       <section>
-        <h2
-          className="text-lg font-bold mb-2"
-          aria-label="Header for the section of completed Tasks"
-        >
+        <h2 className="text-lg font-bold mb-2" aria-label="completed tasks">
           Completed Tasks
         </h2>
         {localData.some((item) => item.status === "completed") ? (
@@ -230,28 +247,7 @@ export default function ToDoItems() {
             {isEditMode ? (
               <Edit todo={selectedTodo} onClose={handleCloseDialog} />
             ) : (
-              <div className="space-y-4">
-                <div>
-                  <p className="font-semibold">Title:</p>
-                  <p>{selectedTodo.title}</p>
-                </div>
-                <div>
-                  <p className="font-semibold">Description:</p>
-                  <p>{selectedTodo.description}</p>
-                </div>
-                <div>
-                  <p className="font-semibold">Status:</p>
-                  <p>{selectedTodo.status}</p>
-                </div>
-                <div>
-                  <p className="font-semibold">Deadline:</p>
-                  <p>
-                    {selectedTodo.deadline
-                      ? new Date(selectedTodo.deadline).toLocaleString()
-                      : "No deadline"}
-                  </p>
-                </div>
-              </div>
+              <ToDoItemDetails todo={selectedTodo} />
             )}
 
             <DialogFooter>
@@ -260,12 +256,15 @@ export default function ToDoItems() {
                   variant="default"
                   size="sm"
                   onClick={() => setIsEditMode(true)}
+                  aria-label="edit"
                 >
                   Edit
                 </Button>
               )}
               <DialogClose asChild>
-                <Button variant="secondary">Close</Button>
+                <Button variant="secondary" aria-label="close details window">
+                  Close
+                </Button>
               </DialogClose>
             </DialogFooter>
           </DialogContent>

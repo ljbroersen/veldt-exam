@@ -75,8 +75,20 @@ module.exports = {
       },
     },
   },
+
+  // Added a default styling for p and h2 because those will be used on more than one occassion and it's easier to change this way.
   plugins: [
-    require("tailwindcss-animate"),
-    require("@tailwindcss/aspect-ratio"),
+    function ({ addBase }: any) {
+      addBase({
+        p: {
+          fontSize: "0.875rem",
+          color: "#4B5563",
+        },
+        h2: {
+          fontSize: "1.5rem",
+          color: "#000000",
+        },
+      });
+    },
   ],
 };

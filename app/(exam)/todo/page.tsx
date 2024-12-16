@@ -18,16 +18,16 @@ export default function Page() {
   return (
     <div className="flex flex-col w-full max-w-3xl mx-auto space-y-2">
       <div className="flex flex-row justify-between items-center w-full mb-4">
-        <h2 className="text-2xl font-bold text-gray-900 leading-8">
-          ToDo items
-        </h2>
+        <h2 className="font-bold leading-8">ToDo items</h2>
+
+        {/* Adding a ToDo Item (button) */}
         <Dialog>
           <DialogTrigger asChild>
             <Button
               variant="default"
               size="icon"
               className="flex items-center justify-center leading-none"
-              aria-label="Add a new ToDo Item"
+              aria-label="add new"
             >
               +
             </Button>
@@ -48,6 +48,8 @@ export default function Page() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* The ToDo Items getting fetched in a separate component */}
       <ToDoItems />
     </div>
   );

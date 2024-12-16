@@ -14,6 +14,7 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Textarea } from "./ui/textarea";
 
+// Validation and error handling
 const schema = yup.object().shape({
   title: yup
     .string()
@@ -38,6 +39,7 @@ export default function Add() {
   const queryClient = useQueryClient();
   const { mockUsecase } = useUsecases();
 
+  // Logic behind creating a ToDo Item
   const { mutate: createToDoDef, isError } = useMutation({
     mutationFn: (newToDo: any) => mockUsecase.createToDoDef(newToDo),
     onMutate: async (newToDo) => {
@@ -71,17 +73,19 @@ export default function Add() {
     resolver: yupResolver(schema),
   });
 
+  // When the ToDo Item couldn't be created correctly
   if (isError) {
-    return <p>Error creating task</p>;
+    return <p>Error creating ToDoItem</p>;
   }
 
+  // Logic behind submitting the data
   const onSubmit = (data: any) => {
-    console.log("Submitting form data:", data);
     createToDoDef(data);
     methods.reset();
   };
 
   return (
+    // The form with separate input/text fields for Title, Description, Deadline
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)}>
         <FormField
@@ -89,7 +93,12 @@ export default function Add() {
           control={methods.control}
           render={({ field }) => (
             <>
-              <FormLabel htmlFor="title">Title</FormLabel>
+              <div className="flex flex-column justify-between items-center">
+                <FormLabel htmlFor="title">Title</FormLabel>
+                <FormMessage>
+                  {methods.formState.errors.title?.message}
+                </FormMessage>
+              </div>
               <FormControl>
                 <Input
                   {...field}
@@ -99,9 +108,6 @@ export default function Add() {
                   maxLength={16}
                 />
               </FormControl>
-              <FormMessage>
-                {methods.formState.errors.title?.message}
-              </FormMessage>
             </>
           )}
         />
@@ -111,7 +117,12 @@ export default function Add() {
           control={methods.control}
           render={({ field }) => (
             <>
-              <FormLabel htmlFor="description">Description</FormLabel>
+              <div className="flex flex-column justify-between items-center">
+                <FormLabel htmlFor="description">Description</FormLabel>
+                <FormMessage>
+                  {methods.formState.errors.description?.message}
+                </FormMessage>
+              </div>
               <FormControl>
                 <Textarea
                   {...field}
@@ -121,9 +132,6 @@ export default function Add() {
                   rows={4}
                 />
               </FormControl>
-              <FormMessage>
-                {methods.formState.errors.description?.message}
-              </FormMessage>
             </>
           )}
         />
@@ -133,7 +141,12 @@ export default function Add() {
           control={methods.control}
           render={({ field }) => (
             <>
-              <FormLabel htmlFor="deadline">Deadline</FormLabel>
+              <div className="flex flex-column justify-between items-center">
+                <FormLabel htmlFor="deadline">Deadline</FormLabel>
+                <FormMessage>
+                  {methods.formState.errors.deadline?.message}
+                </FormMessage>
+              </div>
               <FormControl>
                 <Input
                   {...field}
@@ -144,14 +157,16 @@ export default function Add() {
                   className="w-min"
                 />
               </FormControl>
-              <FormMessage>
-                {methods.formState.errors.deadline?.message}
-              </FormMessage>
             </>
           )}
         />
 
-        <Button variant="default" size="lg" type="submit">
+        <Button
+          variant="default"
+          size="lg"
+          type="submit"
+          aria-label="submit new"
+        >
           Submit
         </Button>
       </form>
