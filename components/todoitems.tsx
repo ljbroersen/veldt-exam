@@ -16,13 +16,14 @@ import { useUsecases } from "@/context/usecase";
 import { useEffect, useState } from "react";
 import Edit from "./edit";
 import ToDoItemDetails from "./todoitems-details";
+import { ToDoDef } from "@/core/mock/type";
 
 export default function ToDoItems() {
   const { mockUsecase } = useUsecases();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-  const [selectedTodo, setSelectedTodo] = useState<any>(null);
-  const [localData, setLocalData] = useState<any[]>([]);
+  const [selectedTodo, setSelectedTodo] = useState<ToDoDef | null>(null);
+  const [localData, setLocalData] = useState<ToDoDef[]>([]);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
   // Logic for fetching the initial mock data
@@ -37,9 +38,11 @@ export default function ToDoItems() {
 
   // Logic behind local storage
   useEffect(() => {
-    if (data) {
+    if (data && Array.isArray(data)) {
       handleSaveToLocalStorage(data);
       setLocalData(data);
+    } else {
+      setLocalData([]);
     }
   }, [data]);
 
@@ -55,7 +58,7 @@ export default function ToDoItems() {
     }
   }, []);
 
-  const handleSaveToLocalStorage = (data: any[]) => {
+  const handleSaveToLocalStorage = (data: ToDoDef[]) => {
     try {
       localStorage.setItem("todo-items", JSON.stringify(data));
     } catch (error) {
@@ -89,7 +92,7 @@ export default function ToDoItems() {
   });
 
   // Logic behind showing the right ToDo Item when clicking on the "..." button
-  const handleToggleDialog = (todo?: any) => {
+  const handleToggleDialog = (todo?: ToDoDef) => {
     if (todo) {
       setSelectedTodo(todo);
       setIsDialogOpen(true);
@@ -132,7 +135,7 @@ export default function ToDoItems() {
   }
 
   // renderToDoItems creates the compact, list-like version of each ToDo Item, sorted by Incomplete and Completed Tasks
-  const renderToDoItems = (data: any[]) => {
+  const renderToDoItems = (data: ToDoDef[]) => {
     return data.map((attr: any, index: number) => (
       <div
         className={`flex flex-row items-center gap-x-3 my-2 w-full ${
@@ -224,7 +227,7 @@ export default function ToDoItems() {
             localData.filter((attr) => attr.status === "completed")
           )
         ) : (
-          <p>No completed tasks</p>
+          <p>You have not completed any tasks yet!</p>
         )}
       </section>
 
