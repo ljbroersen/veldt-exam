@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +19,7 @@ import ToDoItemDetails from "./todoitems-details";
 
 export default function ToDoItems() {
   const { mockUsecase } = useUsecases();
+  const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [selectedTodo, setSelectedTodo] = useState<any>(null);
   const [localData, setLocalData] = useState<any[]>([]);
@@ -30,6 +31,8 @@ export default function ToDoItems() {
     queryFn: () => mockUsecase.fetchToDoDef(),
     staleTime: Infinity,
     gcTime: Infinity,
+    refetchOnWindowFocus: true,
+    refetchInterval: 10000,
   });
 
   // Logic behind local storage
@@ -70,6 +73,7 @@ export default function ToDoItems() {
       );
       setLocalData(updatedData);
       handleSaveToLocalStorage(updatedData);
+      queryClient.invalidateQueries({ queryKey: ["todo-def"] });
     },
   });
 
@@ -80,6 +84,7 @@ export default function ToDoItems() {
       const updatedData = localData.filter((item) => item.id !== variables);
       setLocalData(updatedData);
       handleSaveToLocalStorage(updatedData);
+      queryClient.invalidateQueries({ queryKey: ["todo-def"] });
     },
   });
 
