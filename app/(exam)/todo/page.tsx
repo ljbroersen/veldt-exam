@@ -31,7 +31,6 @@ export default function Page() {
       <div className="flex flex-row justify-between items-center w-full mb-4">
         <h2 className="font-bold leading-8">ToDo items</h2>
 
-        {/* Adding a ToDo Item (button) */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button

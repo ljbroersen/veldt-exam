@@ -75,8 +75,6 @@ module.exports = {
       },
     },
   },
-
-  // Added a default styling for p and h2 because those will be used on more than one occassion and it's easier to change this way.
   plugins: [
     function ({ addBase }: any) {
       addBase({

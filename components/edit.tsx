@@ -21,7 +21,6 @@ type EditProps = {
   onClose: () => void;
 };
 
-// Validation and error handling
 const schema = yup.object().shape({
   title: yup
     .string()
@@ -45,7 +44,6 @@ export default function Edit({ todo, onClose }: Readonly<EditProps>) {
   const queryClient = useQueryClient();
   const { mockUsecase } = useUsecases();
 
-  // Logic behind changing a ToDo Item
   const { mutate: updateToDoDef, isError } = useMutation({
     mutationFn: (updatedToDo: ToDoDef) =>
       mockUsecase.updateToDoDef(todo.id, updatedToDo),
@@ -80,25 +78,22 @@ export default function Edit({ todo, onClose }: Readonly<EditProps>) {
     });
   }, [todo]);
 
-  // When the ToDo Item couldn't be updated correctly
   if (isError) {
     return <p>Error updating ToDoItem</p>;
   }
 
-  // Logic behind submitting the data
   const onSubmit = (data: any) => {
     updateToDoDef(data);
   };
 
   return (
-    // The form with separate input/text fields for Title, Description, Deadline
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)}>
         <FormField
           name="title"
           control={methods.control}
           render={({ field }) => (
-            <>
+            <div>
               <div className="flex flex-column justify-between items-center">
                 <FormLabel htmlFor="title">Title</FormLabel>
                 <FormMessage>
@@ -114,7 +109,7 @@ export default function Edit({ todo, onClose }: Readonly<EditProps>) {
                   maxLength={16}
                 />
               </FormControl>
-            </>
+            </div>
           )}
         />
 
@@ -146,7 +141,7 @@ export default function Edit({ todo, onClose }: Readonly<EditProps>) {
           name="deadline"
           control={methods.control}
           render={({ field }) => (
-            <>
+            <div>
               <div className="flex flex-column justify-between items-center">
                 <FormLabel htmlFor="deadline">Deadline</FormLabel>
                 <FormMessage>
@@ -154,17 +149,27 @@ export default function Edit({ todo, onClose }: Readonly<EditProps>) {
                 </FormMessage>
               </div>
 
-              <FormControl>
-                <Input
-                  {...field}
-                  id="deadline"
-                  type="datetime-local"
-                  placeholder="Edit the deadline"
-                  value={formatDeadline(field.value) ?? ""}
-                  className="w-min"
-                />
-              </FormControl>
-            </>
+              <div className="flex flex-column items-center">
+                <FormControl>
+                  <Input
+                    {...field}
+                    id="deadline"
+                    type="datetime-local"
+                    value={field.value ?? ""}
+                    className="w-min"
+                  />
+                </FormControl>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  type="button"
+                  onClick={() => methods.setValue("deadline", "")}
+                  className="cursor-pointer ml-2"
+                >
+                  x
+                </Button>
+              </div>
+            </div>
           )}
         />
 

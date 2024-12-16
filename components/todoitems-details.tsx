@@ -1,6 +1,5 @@
 import { Badge } from "@/components/ui/badge";
 
-// A detailed overview of a ToDo Item, after you clicked on the "..."
 export default function ToDoItemDetails({ todo }: any) {
   if (!todo) return null;
 

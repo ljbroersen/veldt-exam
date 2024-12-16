@@ -26,7 +26,6 @@ export default function ToDoItems() {
   const [localData, setLocalData] = useState<ToDoDef[]>([]);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
-  // Logic for fetching the initial mock data
   const { data, isPending, isError } = useQuery({
     queryKey: ["todo-def"],
     queryFn: () => mockUsecase.fetchToDoDef(),
@@ -36,7 +35,6 @@ export default function ToDoItems() {
     refetchInterval: 10000,
   });
 
-  // Logic behind local storage
   useEffect(() => {
     if (data && Array.isArray(data)) {
       handleSaveToLocalStorage(data);
@@ -66,7 +64,6 @@ export default function ToDoItems() {
     }
   };
 
-  // Logic behind changing the status of a ToDo Item
   const { mutate: toggleStatus } = useMutation({
     mutationFn: (toDoItem: { id: number; status: string }) =>
       mockUsecase.updateToDoStatus(toDoItem.id, toDoItem.status),
@@ -80,7 +77,6 @@ export default function ToDoItems() {
     },
   });
 
-  // Logic behind deleting a ToDo Item
   const { mutate: deleteToDo } = useMutation({
     mutationFn: (id: number) => mockUsecase.deleteToDoDef(id, {}),
     onSuccess: (_, variables) => {
@@ -91,7 +87,6 @@ export default function ToDoItems() {
     },
   });
 
-  // Logic behind showing the right ToDo Item when clicking on the "..." button
   const handleToggleDialog = (todo?: ToDoDef) => {
     if (todo) {
       setSelectedTodo(todo);
@@ -102,14 +97,12 @@ export default function ToDoItems() {
     }
   };
 
-  // Logic behind closing the Dialog that was opened with handleToggleDialog
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setSelectedTodo(null);
     setIsEditMode(false);
   };
 
-  // Logic to check if the deadline is within 24 hours of the current time (or if it has already passed)
   const isApproachingDeadline = (deadline: string | null | undefined) => {
     if (!deadline) return false;
     const deadlineTime = new Date(deadline).getTime();
@@ -118,7 +111,6 @@ export default function ToDoItems() {
     return Math.abs(deadlineTime - currentTime) <= 24 * 60 * 60 * 1000;
   };
 
-  // While the ToDo Items are being rendered
   if (isPending) {
     return (
       <div className="flex flex-col w-full max-w-2xl mx-auto space-y-2">
@@ -129,12 +121,10 @@ export default function ToDoItems() {
     );
   }
 
-  // When the ToDo Items couldn't be fetched correctly
   if (isError) {
     return <p>Error loading toDo Items</p>;
   }
 
-  // renderToDoItems creates the compact, list-like version of each ToDo Item, sorted by Incomplete and Completed Tasks
   const renderToDoItems = (data: ToDoDef[]) => {
     return data.map((attr: ToDoDef, index: number) => (
       <div

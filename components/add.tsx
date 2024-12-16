@@ -15,23 +15,13 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Textarea } from "./ui/textarea";
 import { ToDoDef } from "@/core/mock/type";
 
-// Validation and error handling
 const schema = yup.object().shape({
   title: yup
     .string()
     .required("Title is required!")
     .max(16, "Title cannot be longer than 16 characters!"),
   description: yup.string().required("Description is required!"),
-  deadline: yup
-    .string()
-    .nullable()
-    .test("not-in-past", "Deadline cannot be in the past!", (value) => {
-      if (!value) return true;
-      const selectedDate = new Date(value);
-      const now = new Date();
-      now.setSeconds(0, 0);
-      return selectedDate >= now;
-    }),
+  deadline: yup.string().nullable(),
   created_at: yup.date().default(() => new Date()),
   updated_at: yup.date().default(() => new Date()),
 });
@@ -44,7 +34,6 @@ export default function Add({ onClose }: Readonly<AddProps>) {
   const queryClient = useQueryClient();
   const { mockUsecase } = useUsecases();
 
-  // Logic behind creating a ToDo Item
   const { mutate: createToDoDef, isError } = useMutation({
     mutationFn: (newToDo: ToDoDef) => mockUsecase.createToDoDef(newToDo),
     onMutate: async (newToDo) => {
@@ -79,26 +68,23 @@ export default function Add({ onClose }: Readonly<AddProps>) {
     resolver: yupResolver(schema),
   });
 
-  // When the ToDo Item couldn't be created correctly
-  if (isError) {
-    return <p>Error creating ToDoItem</p>;
-  }
-
-  // Logic behind submitting the data
   const onSubmit = (data: any) => {
     createToDoDef(data);
     methods.reset();
   };
 
+  if (isError) {
+    return <p>Error creating ToDoItem</p>;
+  }
+
   return (
-    // The form with separate input/text fields for Title, Description, Deadline
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)}>
         <FormField
           name="title"
           control={methods.control}
           render={({ field }) => (
-            <>
+            <div>
               <div className="flex flex-column justify-between items-center">
                 <FormLabel htmlFor="title">Title</FormLabel>
                 <FormMessage>
@@ -114,7 +100,7 @@ export default function Add({ onClose }: Readonly<AddProps>) {
                   maxLength={16}
                 />
               </FormControl>
-            </>
+            </div>
           )}
         />
 
@@ -122,7 +108,7 @@ export default function Add({ onClose }: Readonly<AddProps>) {
           name="description"
           control={methods.control}
           render={({ field }) => (
-            <>
+            <div>
               <div className="flex flex-column justify-between items-center">
                 <FormLabel htmlFor="description">Description</FormLabel>
                 <FormMessage>
@@ -138,7 +124,7 @@ export default function Add({ onClose }: Readonly<AddProps>) {
                   rows={4}
                 />
               </FormControl>
-            </>
+            </div>
           )}
         />
 
@@ -146,24 +132,34 @@ export default function Add({ onClose }: Readonly<AddProps>) {
           name="deadline"
           control={methods.control}
           render={({ field }) => (
-            <>
-              <div className="flex flex-column justify-between items-center">
+            <div>
+              <div className="flex flex-column justify-between items-center mt-2">
                 <FormLabel htmlFor="deadline">Deadline</FormLabel>
                 <FormMessage>
                   {methods.formState.errors.deadline?.message}
                 </FormMessage>
               </div>
-              <FormControl>
-                <Input
-                  {...field}
-                  id="deadline"
-                  type="datetime-local"
-                  placeholder="Select deadline"
-                  value={field.value ?? ""}
-                  className="w-min"
-                />
-              </FormControl>
-            </>
+              <div className="flex flex-column items-center">
+                <FormControl>
+                  <Input
+                    {...field}
+                    id="deadline"
+                    type="datetime-local"
+                    value={field.value ?? ""}
+                    className="w-min"
+                  />
+                </FormControl>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  type="button"
+                  onClick={() => methods.setValue("deadline", "")}
+                  className="cursor-pointer ml-2"
+                >
+                  x
+                </Button>
+              </div>
+            </div>
           )}
         />
 
@@ -172,6 +168,7 @@ export default function Add({ onClose }: Readonly<AddProps>) {
           size="lg"
           type="submit"
           aria-label="submit new"
+          className="mt-4"
         >
           Submit
         </Button>
