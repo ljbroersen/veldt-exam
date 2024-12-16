@@ -40,7 +40,7 @@ const schema = yup.object().shape({
   updated_at: yup.date().default(() => new Date()),
 });
 
-export default function Edit({ todo, onClose }: EditProps) {
+export default function Edit({ todo, onClose }: Readonly<EditProps>) {
   const queryClient = useQueryClient();
   const { mockUsecase } = useUsecases();
 
@@ -159,7 +159,7 @@ export default function Edit({ todo, onClose }: EditProps) {
                   id="deadline"
                   type="datetime-local"
                   placeholder="Edit the deadline"
-                  value={formatDeadline(field.value) || ""}
+                  value={formatDeadline(field.value) ?? ""}
                   className="w-min"
                 />
               </FormControl>

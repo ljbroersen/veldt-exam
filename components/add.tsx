@@ -35,7 +35,11 @@ const schema = yup.object().shape({
   updated_at: yup.date().default(() => new Date()),
 });
 
-export default function Add() {
+interface AddProps {
+  onClose: () => void;
+}
+
+export default function Add({ onClose }: Readonly<AddProps>) {
   const queryClient = useQueryClient();
   const { mockUsecase } = useUsecases();
 
@@ -57,8 +61,9 @@ export default function Add() {
     onError: (context: any) => {
       queryClient.setQueryData(["todo-def"], context.previousToDos);
     },
-    onSettled: () => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["todo-def"] });
+      onClose();
     },
   });
 
@@ -153,7 +158,7 @@ export default function Add() {
                   id="deadline"
                   type="datetime-local"
                   placeholder="Select deadline"
-                  value={field.value || ""}
+                  value={field.value ?? ""}
                   className="w-min"
                 />
               </FormControl>

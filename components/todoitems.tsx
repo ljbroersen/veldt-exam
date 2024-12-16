@@ -106,15 +106,13 @@ export default function ToDoItems() {
     setIsEditMode(false);
   };
 
-  // Logic to check if the deadline is within 24 hours of the current time
+  // Logic to check if the deadline is within 24 hours of the current time (or if it has already passed)
   const isApproachingDeadline = (deadline: string | null | undefined) => {
     if (!deadline) return false;
     const deadlineTime = new Date(deadline).getTime();
     const currentTime = new Date().getTime();
-    return (
-      deadlineTime > currentTime &&
-      deadlineTime - currentTime <= 24 * 60 * 60 * 1000
-    );
+
+    return Math.abs(deadlineTime - currentTime) <= 24 * 60 * 60 * 1000;
   };
 
   // While the ToDo Items are being rendered
