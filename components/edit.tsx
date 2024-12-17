@@ -15,6 +15,7 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Textarea } from "./ui/textarea";
 import { ToDoDef } from "@/core/mock/type";
+import { toast } from "react-toastify";
 
 type EditProps = {
   todo: ToDoDef;
@@ -44,11 +45,19 @@ export default function Edit({ todo, onClose }: Readonly<EditProps>) {
   const queryClient = useQueryClient();
   const { mockUsecase } = useUsecases();
 
+  const showToastMessage = () => {
+    toast.success("ToDo Item edited successfully!", {
+      position: "top-center",
+      autoClose: 2000,
+    });
+  };
+
   const { mutate: updateToDoDef, isError } = useMutation({
     mutationFn: (updatedToDo: ToDoDef) =>
       mockUsecase.updateToDoDef(todo.id, updatedToDo),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["todo-def"] });
+      showToastMessage();
       onClose();
     },
   });

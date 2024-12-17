@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import Edit from "./edit";
 import ToDoItemDetails from "./todoitems-details";
 import { ToDoDef } from "@/core/mock/type";
+import { toast } from "react-toastify";
 
 export default function ToDoItems() {
   const { mockUsecase } = useUsecases();
@@ -25,6 +26,13 @@ export default function ToDoItems() {
   const [selectedTodo, setSelectedTodo] = useState<ToDoDef | null>(null);
   const [localData, setLocalData] = useState<ToDoDef[]>([]);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
+
+  const showToastMessage = () => {
+    toast.success("ToDo Item deleted successfully!", {
+      position: "top-center",
+      autoClose: 2000,
+    });
+  };
 
   const { data, isPending, isError } = useQuery({
     queryKey: ["todo-def"],
@@ -84,6 +92,7 @@ export default function ToDoItems() {
       setLocalData(updatedData);
       handleSaveToLocalStorage(updatedData);
       queryClient.invalidateQueries({ queryKey: ["todo-def"] });
+      showToastMessage();
     },
   });
 

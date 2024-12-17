@@ -14,6 +14,7 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Textarea } from "./ui/textarea";
 import { ToDoDef } from "@/core/mock/type";
+import { toast } from "react-toastify";
 
 const schema = yup.object().shape({
   title: yup
@@ -34,6 +35,13 @@ export default function Add({ onClose }: Readonly<AddProps>) {
   const queryClient = useQueryClient();
   const { mockUsecase } = useUsecases();
 
+  const showToastMessage = () => {
+    toast.success("ToDo Item added successfully!", {
+      position: "top-center",
+      autoClose: 2000,
+    });
+  };
+
   const { mutate: createToDoDef, isError } = useMutation({
     mutationFn: (newToDo: ToDoDef) => mockUsecase.createToDoDef(newToDo),
     onMutate: async (newToDo) => {
@@ -53,6 +61,7 @@ export default function Add({ onClose }: Readonly<AddProps>) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["todo-def"] });
+      showToastMessage();
       onClose();
     },
   });
@@ -78,101 +87,103 @@ export default function Add({ onClose }: Readonly<AddProps>) {
   }
 
   return (
-    <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)}>
-        <FormField
-          name="title"
-          control={methods.control}
-          render={({ field }) => (
-            <div>
-              <div className="flex flex-column justify-between items-center">
-                <FormLabel htmlFor="title">Title</FormLabel>
-                <FormMessage>
-                  {methods.formState.errors.title?.message}
-                </FormMessage>
-              </div>
-              <FormControl>
-                <Input
-                  {...field}
-                  id="title"
-                  placeholder="Enter a title"
-                  value={field.value}
-                  maxLength={16}
-                />
-              </FormControl>
-            </div>
-          )}
-        />
-
-        <FormField
-          name="description"
-          control={methods.control}
-          render={({ field }) => (
-            <div>
-              <div className="flex flex-column justify-between items-center">
-                <FormLabel htmlFor="description">Description</FormLabel>
-                <FormMessage>
-                  {methods.formState.errors.description?.message}
-                </FormMessage>
-              </div>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  id="description"
-                  placeholder="Enter a description"
-                  value={field.value}
-                  rows={4}
-                />
-              </FormControl>
-            </div>
-          )}
-        />
-
-        <FormField
-          name="deadline"
-          control={methods.control}
-          render={({ field }) => (
-            <div>
-              <div className="flex flex-column justify-between items-center mt-2">
-                <FormLabel htmlFor="deadline">Deadline</FormLabel>
-                <FormMessage>
-                  {methods.formState.errors.deadline?.message}
-                </FormMessage>
-              </div>
-              <div className="flex flex-column items-center">
+    <>
+      <FormProvider {...methods}>
+        <form onSubmit={methods.handleSubmit(onSubmit)}>
+          <FormField
+            name="title"
+            control={methods.control}
+            render={({ field }) => (
+              <div>
+                <div className="flex flex-column justify-between items-center">
+                  <FormLabel htmlFor="title">Title</FormLabel>
+                  <FormMessage>
+                    {methods.formState.errors.title?.message}
+                  </FormMessage>
+                </div>
                 <FormControl>
                   <Input
                     {...field}
-                    id="deadline"
-                    type="datetime-local"
-                    value={field.value ?? ""}
-                    className="w-min"
+                    id="title"
+                    placeholder="Enter a title"
+                    value={field.value}
+                    maxLength={16}
                   />
                 </FormControl>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  type="button"
-                  onClick={() => methods.setValue("deadline", "")}
-                  className="cursor-pointer ml-2"
-                >
-                  x
-                </Button>
               </div>
-            </div>
-          )}
-        />
+            )}
+          />
 
-        <Button
-          variant="default"
-          size="lg"
-          type="submit"
-          aria-label="submit new"
-          className="mt-4"
-        >
-          Submit
-        </Button>
-      </form>
-    </FormProvider>
+          <FormField
+            name="description"
+            control={methods.control}
+            render={({ field }) => (
+              <div>
+                <div className="flex flex-column justify-between items-center">
+                  <FormLabel htmlFor="description">Description</FormLabel>
+                  <FormMessage>
+                    {methods.formState.errors.description?.message}
+                  </FormMessage>
+                </div>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    id="description"
+                    placeholder="Enter a description"
+                    value={field.value}
+                    rows={4}
+                  />
+                </FormControl>
+              </div>
+            )}
+          />
+
+          <FormField
+            name="deadline"
+            control={methods.control}
+            render={({ field }) => (
+              <div>
+                <div className="flex flex-column justify-between items-center mt-2">
+                  <FormLabel htmlFor="deadline">Deadline</FormLabel>
+                  <FormMessage>
+                    {methods.formState.errors.deadline?.message}
+                  </FormMessage>
+                </div>
+                <div className="flex flex-column items-center">
+                  <FormControl>
+                    <Input
+                      {...field}
+                      id="deadline"
+                      type="datetime-local"
+                      value={field.value ?? ""}
+                      className="w-min"
+                    />
+                  </FormControl>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    type="button"
+                    onClick={() => methods.setValue("deadline", "")}
+                    className="cursor-pointer ml-2"
+                  >
+                    x
+                  </Button>
+                </div>
+              </div>
+            )}
+          />
+
+          <Button
+            variant="default"
+            size="lg"
+            type="submit"
+            aria-label="submit new"
+            className="mt-4"
+          >
+            Submit
+          </Button>
+        </form>
+      </FormProvider>
+    </>
   );
 }
